@@ -23,10 +23,23 @@ android {
 }
 
 dependencies {
+    // in-built dependencies
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // running an older version b/c facebook login runs into compatibility issues with some
+    // libraries of newer version. If I exclude the clashing modules the fb sdk does not compile
+    implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+
+    // design library
+    implementation 'com.android.support:design:27.0.2'
+    // recycler view
+    implementation 'com.android.support:recyclerview-v7:27.0.2'
+
+    // facebook sdk
+    implementation 'com.facebook.android:facebook-login:4.33.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

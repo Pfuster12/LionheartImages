@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">LionheartImages</string>
+
+    <!-- Toolbar title -->
+    <string name="toolbar_title">Lionheart Images</string>
+
+    <!-- Facebook app id -->
+    <string name="facebook_app_id">247340112688200</string>
+    <!-- Toolbar title -->
+    <string name="fb_login_protocol_scheme">fb247340112688200</string>
 </resources>
