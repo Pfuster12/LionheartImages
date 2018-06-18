@@ -10,7 +10,6 @@ import android.preference.PreferenceManager
  * Activity handling display of the main list of images stored in the app for editing and sharing.
  */
 class MainActivity : AppCompatActivity() {
-
     /*
      / global variables
      */

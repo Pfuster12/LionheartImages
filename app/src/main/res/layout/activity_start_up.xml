@@ -15,4 +15,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <Button
+        android:id="@+id/instagram_login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/instagram_title"
+        android:background="@color/colorAccent"
+        android:layout_margin="16dp"
+        app:layout_constraintTop_toBottomOf="@id/fb_login_button"
+        app:layout_constraintStart_toStartOf="@id/fb_login_button"
+        app:layout_constraintEnd_toEndOf="@id/fb_login_button"/>
+
 </android.support.constraint.ConstraintLayout>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WebViewActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/webview_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height">
+
+        <ImageButton
+            android:contentDescription="@string/cancel_content_description"
+            android:layout_width="@dimen/ic_dimen"
+            android:layout_height="@dimen/ic_dimen"
+            android:src="@drawable/ic_cancel"
+            android:background="@android:color/transparent"/>
+
+        <TextView
+            android:id="@+id/webview_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/general_margin_dimen"
+            android:paddingEnd="@dimen/general_margin_dimen"
+            android:text="@string/instagram_toolbar_auth"
+            style="@style/ToolbarTitle"/>
+    </android.support.v7.widget.Toolbar>
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/webview_toolbar"/>
+
+</android.support.constraint.ConstraintLayout>

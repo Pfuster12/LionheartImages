@@ -9,10 +9,12 @@ import android.view.ViewGroup
 
 class LionheartRecyclerViewAdapter(private val context: Context) : RecyclerView.Adapter<ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        // create view holder
-        return ImageViewHolder(inflateViewHolder(R.layout.image_item, parent))
-    }
+    private val IMAGE_ITEM_TYPE = 101
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
+            IMAGE_ITEM_TYPE -> ImageViewHolder(inflateViewHolder(R.layout.image_item, parent))
+            else -> ImageViewHolder(inflateViewHolder(R.layout.image_item, parent))
+        }
 
     /**
      * Helper fun to inflate view
@@ -24,7 +26,11 @@ class LionheartRecyclerViewAdapter(private val context: Context) : RecyclerView.
 
     override fun getItemCount(): Int {
         // get item count
-        return 0
+        return 1
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return IMAGE_ITEM_TYPE
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {

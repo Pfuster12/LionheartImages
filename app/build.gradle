@@ -4,6 +4,13 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+//return a MY API KEY from a properties file.
+static def getMyApiKey(String property) {
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("C:\\Users\\pfust\\Documents\\LionheartImages\\api_user\\api_keys.properties"))
+    return "\"" + properties.getProperty(property) + "\""
+}
+
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -19,6 +26,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    buildTypes.each {
+        it.buildConfigField "String", "INSTA_CLIENT_ID", getMyApiKey("instaClientId")
     }
 }
 

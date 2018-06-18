@@ -9,7 +9,7 @@
     </style>
 
     <!-- Toolbar title style -->
-    <style name="ToolbarTitle" parent="Base.TextAppearance.AppCompat.Title">
+    <style name="ToolbarTitle" parent="Base.TextAppearance.AppCompat.Medium">
     </style>
 
 </resources>

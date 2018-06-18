@@ -8,4 +8,12 @@
     <string name="facebook_app_id">247340112688200</string>
     <!-- Toolbar title -->
     <string name="fb_login_protocol_scheme">fb247340112688200</string>
+
+    <!-- Instagram button -->
+    <string name="instagram_title">Instagram</string>
+    <!-- Instagram Auth toolbar title -->
+    <string name="instagram_toolbar_auth">Instagram Authorisation</string>
+
+    <!-- Cancel button content description -->
+    <string name="cancel_content_description">Cancel button</string>
 </resources>
