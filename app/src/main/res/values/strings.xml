@@ -8,9 +8,13 @@
     <string name="facebook_app_id">247340112688200</string>
     <!-- Toolbar title -->
     <string name="fb_login_protocol_scheme">fb247340112688200</string>
+    <!--fb button log out-->
+    <string name="fb_log_out">LOG OUT</string>
 
     <!-- Instagram button -->
     <string name="instagram_title">Instagram</string>
+    <!--insta button logged in info-->
+    <string name="insta_logged_in">LOGGED IN</string>
     <!-- Facebook button -->
     <string name="facebook_title">Facebook</string>
     <!-- Instagram Auth toolbar title -->
@@ -26,8 +30,14 @@
     <string name="return_start_editing">OK, I\'m done.</string>
 
     <!-- Cancel button content description -->
-    <string name="login_prompt">Alright alright. But first, let me steal some of your profile data.</string>
+    <string name="login_prompt">Alright, alright. But first, let me steal some of your profile data.</string>
+
+    <!-- Cancel button content description -->
+    <string name="return_login_prompt">Good. Will you give me access to your data already?</string>
 
     <!-- Cancel button content description -->
     <string name="return_to_gif">Wait! I want to see that awesome gif again.</string>
+
+    <!--Continue to main activity text-->
+    <string name="continue_main_activity">I\'ve given you all you need. Proceed.</string>
 </resources>

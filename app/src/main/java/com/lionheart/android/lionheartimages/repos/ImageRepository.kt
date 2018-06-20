@@ -93,25 +93,67 @@ class ImageRepository private constructor(private vararg val queryParams: Pair<S
      * Add volley request to the queue and receive JSON response.
      */
     private fun addVolleyRequest(url: String) {
+        // create the json request
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener { response ->
-                    saveImagesToDatabase(response)
+                    // if response is good parse json and save images to database
+                    val images = parseFBImageListJson(response)
+                    saveImagesToDatabase(images)
                 },
                 Response.ErrorListener { error ->
                     //TODO handle error
                     Log.e("JSONTAG", "Response: %s".format(error.toString()))
                 })
 
+        // add it to the queue
         queue?.add(jsonObjectRequest)
     }
 
-    private fun saveImagesToDatabase(response: JSONObject) {
+    /**
+     * Helper fun to parse json response from fb api call and
+     * returning the list of image pojos to save into the database
+     */
+    private fun parseFBImageListJson(response: JSONObject): List<LionheartImage> {
+        // init a list to add objects
+        val images = mutableListOf<LionheartImage>()
+
+        // grab the photos object
+        val photoObject = response.getJSONObject("photos")
+        // grab the data array with the image list
+        val imageJsonArray = photoObject.getJSONArray("data")
+
+        // iterate through the array
+        for (i in 0..imageJsonArray.length()) {
+            // grab the current image
+            val image: JSONObject = imageJsonArray[i] as JSONObject
+
+            val thumbnailIndex = imageJsonArray.length() - 1
+            val thumbnailJson = image.getJSONArray("images")[thumbnailIndex] as JSONObject
+            val thumbnailLink = thumbnailJson.getString("source")
+
+            // grab the data from the image and create the image pojo
+            val imagePojo = image.let {
+                LionheartImage(it.getInt("id"), it.getString("link"),
+                        it.getInt("height"), it.getInt("width"), thumbnailLink)
+            }
+
+            // add pojo into list
+            images.add(imagePojo)
+        }
+
+        // return the list once populated
+        return images
+    }
+
+    /**
+     * Save the image data to the database
+     */
+    private fun saveImagesToDatabase(images: List<LionheartImage>) {
         // init the future to grab the executor task
         var future: Future<Unit>? = null
         // submit a task and assign to the future
         future = executor?.submit<Unit> {
-            val rows: List<Long>? = imageDao?.saveAll(LionheartImage(0, response.toString(),
-                    0, 0, "No"))
+           imageDao?.saveAll(*images.toTypedArray())
         }
 
         // run the future and save to database

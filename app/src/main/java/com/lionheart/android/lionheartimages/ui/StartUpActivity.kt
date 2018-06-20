@@ -57,6 +57,12 @@ class StartUpActivity : AppCompatActivity() {
         setInstaButton()
     }
 
+    private fun isFBLoggedIn(): Boolean {
+        val accessToken = AccessToken.getCurrentAccessToken()
+        return accessToken != null && !accessToken.isExpired
+    }
+
+
     /**
      * Helper fun to set up facebook login button
      */

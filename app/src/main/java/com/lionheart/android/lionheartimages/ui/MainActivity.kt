@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mSharedPreferences: SharedPreferences
     // shared prefs key for boolean
     private val START_UP_IS_SHOWN = "com.lionheart.android.lionheartimages.START_UP_IS_SHOWN"
+    // lateinit
     private lateinit var viewModel: ImagesViewModel
     private var accessToken = "nope"
 
@@ -37,36 +38,45 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // set the transition anim
         val fade = Fade()
-        fade.duration = 900
+        fade.duration = 500
+        fade.startDelay = 500
         window.enterTransition = fade
         setContentView(R.layout.activity_main)
 
-        // allow better transitions
-        //window.allowEnterTransitionOverlap
 
-        // run the start up check
-        checkStartUpScreen()
-
-        accessToken = AccessToken.getCurrentAccessToken().token
-        Log.e("WHYYY", accessToken)
+        if (isFBLoggedIn()) {
+            accessToken = AccessToken.getCurrentAccessToken().token
+        }
         // load images and observe the livedata
         observeViewModel()
     }
 
+    /**
+     * Helper fun to check fb token is current
+     */
+    private fun isFBLoggedIn(): Boolean {
+        val accessToken = AccessToken.getCurrentAccessToken()
+        return accessToken != null && !accessToken.isExpired
+    }
+
+    /**
+     * Helper fun to init the view model and observe the live data object.
+     */
     private fun observeViewModel() {
-        // create the viewmodel
+        // create the view model
         viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
         // observe changes of the LiveData object
         // load the images from the db or fetch from the apis
         viewModel.init(this,
-                Pair("fields", "photos.limit(6)"),
+                Pair("fields", "photos.limit(6){height,id,images,link,name,width}"),
                 Pair("access_token", accessToken))
                 .getImages()?.observe(this, Observer { images ->
             // TODO fill list with dummies if it is null
             if (images != null) {
                 for (image in images.iterator()) {
-                    Log.e("YOO I'M HERE", image.imageLink)
+                    Log.e("HEYY I'M HERE", image.imageLink)
                 }
             }
         })
@@ -88,5 +98,10 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+
+    override fun onBackPressed() {
+        finish()
+        super.onBackPressed()
     }
 }

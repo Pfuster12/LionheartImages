@@ -13,6 +13,7 @@
 
         <ImageButton
             android:contentDescription="@string/cancel_content_description"
+            android:id="@+id/cancel_button"
             android:layout_width="@dimen/ic_dimen"
             android:layout_height="@dimen/ic_dimen"
             android:src="@drawable/ic_cancel"

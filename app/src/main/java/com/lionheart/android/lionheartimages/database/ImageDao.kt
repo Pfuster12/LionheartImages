@@ -12,7 +12,7 @@ interface ImageDao {
     fun getAll(): LiveData<List<LionheartImage>>
 
     @Insert(onConflict = REPLACE)
-    fun saveAll(vararg images: LionheartImage): List<Long>
+    fun saveAll(vararg images: LionheartImage)
 
     @Delete
     fun deleteImages(vararg images: LionheartImage)

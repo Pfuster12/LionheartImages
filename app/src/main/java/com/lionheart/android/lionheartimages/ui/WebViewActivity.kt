@@ -10,6 +10,9 @@ import android.webkit.WebViewClient
 import com.lionheart.android.lionheartimages.R
 import kotlinx.android.synthetic.main.activity_web_view.*
 
+/**
+ * Simple webview activity to handle the instagram auth token redirect
+ */
 class WebViewActivity : AppCompatActivity() {
 
     /*
@@ -31,6 +34,7 @@ class WebViewActivity : AppCompatActivity() {
         setContentView(R.layout.activity_web_view)
 
         setWebView()
+        setCancelAction()
     }
 
     /**
@@ -50,10 +54,12 @@ class WebViewActivity : AppCompatActivity() {
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?) =
                     when (request?.url?.host.equals(INSTA_REDIRECT_URI)) {
                         true -> {
+                            // send the captured token fragment through an intent result
                             val resultIntent = Intent()
                             resultIntent.putExtra(RESULT_AUTH_INTENT_KEY,
                                     request?.url?.fragment)
-                            setResult(StartUpActivity.INSTA_AUTH_RESULT_CODE, resultIntent)
+                            // finish the activity to send the result
+                            setResult(WelcomeScreenActivity.INSTA_AUTH_RESULT_CODE_OK, resultIntent)
                             finish()
                             true
                         }
@@ -63,5 +69,13 @@ class WebViewActivity : AppCompatActivity() {
 
         // set the webview to load the url captured in the intent extra
         webview.loadUrl(webViewUrl)
+    }
+
+    private fun setCancelAction() {
+        cancel_button.setOnClickListener {
+            val resultIntent = Intent()
+            setResult(WelcomeScreenActivity.INSTA_AUTH_RESULT_CODE_ERROR, resultIntent)
+            finish()
+        }
     }
 }
