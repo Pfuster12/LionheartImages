@@ -12,4 +12,9 @@
     <style name="ToolbarTitle" parent="Base.TextAppearance.AppCompat.Medium">
     </style>
 
+    <!-- Toolbar title style -->
+    <style name="button_style" parent="Base.TextAppearance.AppCompat.Button">
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>

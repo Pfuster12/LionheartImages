@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
 
         <!-- Main Activity -->
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +23,7 @@
         </activity>
 
         <!-- StartUp Activity -->
-        <activity android:name=".StartUpActivity" />
+        <activity android:name=".ui.StartUpActivity" />
 
         <!-- Facebook meta-data -->
         <meta-data
@@ -47,7 +47,8 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".WebViewActivity"></activity>
+        <activity android:name=".ui.WebViewActivity" />
+        <activity android:name=".ui.WelcomeScreenActivity"></activity>
     </application>
 
 </manifest>

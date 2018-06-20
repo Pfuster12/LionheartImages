@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- general toolbar height -->
     <dimen name="toolbar_height">55dp</dimen>
 
+    <!-- icon dimension -->
     <dimen name="ic_dimen">16dp</dimen>
 
+    <!-- general margin dimensions -->
     <dimen name="general_margin_dimen">16dp</dimen>
 </resources>

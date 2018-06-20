@@ -1,7 +1,6 @@
-package com.lionheart.android.lionheartimages
+package com.lionheart.android.lionheartimages.ui
 
 import android.content.Intent
-import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -11,8 +10,9 @@ import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
+import com.lionheart.android.lionheartimages.BuildConfig
+import com.lionheart.android.lionheartimages.R
 import kotlinx.android.synthetic.main.activity_start_up.*
-import java.util.*
 
 /**
  * Activity that handles the welcome screen and social media login functionality.
@@ -22,6 +22,12 @@ class StartUpActivity : AppCompatActivity() {
     /*
      / Global variables
      */
+
+    companion object {
+        val INTENT_INSTA_URL_KEY = "com.lionheart.android.lionheartimages.INSTA_URL_KEY"
+        val INSTA_AUTH_RESULT_CODE = 101
+    }
+
     // log tag
     val LOG_TAG = StartUpActivity::class.java.simpleName
 
@@ -35,11 +41,11 @@ class StartUpActivity : AppCompatActivity() {
             BuildConfig.INSTA_CLIENT_ID +
             "&redirect_uri=" +
             REDIRECT_URI + "&response_type=token"
+    private lateinit var accessToken: AccessToken
 
-    companion object {
-        val INTENT_INSTA_URL_KEY = "com.lionheart.android.lionheartimages.INSTA_URL_KEY"
-        val INSTA_AUTH_RESULT_CODE = 101
-    }
+    /*
+     / functions
+     */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,10 +55,6 @@ class StartUpActivity : AppCompatActivity() {
         setFBButton()
 
         setInstaButton()
-
-        // check if app is logged in to fb through the access token
-        val accessToken = AccessToken.getCurrentAccessToken()
-        val isLoggedIn = accessToken != null && !accessToken.isExpired
     }
 
     /**
@@ -70,6 +72,14 @@ class StartUpActivity : AppCompatActivity() {
 
             override fun onSuccess(result: LoginResult?) {
                 // success login, capture the access token
+                // check if app is logged in to fb through the access token
+                accessToken = result!!.accessToken
+                Log.e("YOO", accessToken.token)
+
+                test_b.setOnClickListener {
+                    val intent = Intent(this@StartUpActivity, MainActivity::class.java)
+                    startActivity(intent)
+                }
             }
 
             override fun onCancel() {
@@ -100,8 +110,13 @@ class StartUpActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         // callback to the facebook manager
         mCallbackManager.onActivityResult(requestCode, resultCode, data)
+
+        // check if the instagram auth flow returns and acess token and retrieve it
         if (resultCode == INSTA_AUTH_RESULT_CODE) {
-            val authCode = data?.getStringExtra(WebViewActivity.RESULT_AUTH_INTENT_KEY)
+            // grab the fragment
+            val fragment = data?.getStringExtra(WebViewActivity.RESULT_AUTH_INTENT_KEY)
+            // cull the text parameter
+            val authCode = fragment?.drop(13)
             Log.e(LOG_TAG, authCode.toString())
         }
         super.onActivityResult(requestCode, resultCode, data)
