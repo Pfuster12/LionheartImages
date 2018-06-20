@@ -6,15 +6,37 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowActivityTransitions">true</item>
+    </style>
+
+    <!-- Toolbar title style -->
+    <style name="LogoTitle" parent="Base.TextAppearance.AppCompat.Title">
+        <item name="android:fontFamily">@font/sueellenfranciso</item>
+        <item name="android:textSize">64sp</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <!-- Toolbar title style -->
     <style name="ToolbarTitle" parent="Base.TextAppearance.AppCompat.Medium">
     </style>
 
-    <!-- Toolbar title style -->
-    <style name="button_style" parent="Base.TextAppearance.AppCompat.Button">
+    <!-- button style -->
+    <style name="buttonStyle" parent="Base.TextAppearance.AppCompat.Button">
         <item name="android:textSize">12sp</item>
+        <item name="android:drawablePadding">@dimen/general_margin_dimen</item>
+        <item name="android:paddingStart">@dimen/general_margin_dimen</item>
+        <item name="android:paddingEnd">@dimen/general_margin_dimen</item>
+        <item name="android:textColor">@color/colorBackgroundWhite</item>
+        <item name="android:drawableTint">@color/colorBackgroundWhite</item>
     </style>
 
+    <!-- Toolbar title style -->
+    <style name="BodyTextStyle" parent="Base.TextAppearance.AppCompat.Title">
+        <item name="android:fontFamily">@font/coming_soon_font</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textColor">@color/colorTextGray</item>
+    </style>
 </resources>

@@ -15,11 +15,7 @@
 
         <!-- Main Activity -->
         <activity android:name=".ui.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <!-- StartUp Activity -->
@@ -48,7 +44,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.WebViewActivity" />
-        <activity android:name=".ui.WelcomeScreenActivity"></activity>
+        <activity android:name=".ui.WelcomeScreenActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

@@ -26,7 +26,7 @@
         android:drawablePadding="@dimen/general_margin_dimen"
         android:paddingStart="@dimen/general_margin_dimen"
         android:paddingEnd="@dimen/general_margin_dimen"
-        style="@style/button_style"
+        style="@style/buttonStyle"
         app:layout_constraintTop_toBottomOf="@id/fb_login_button"
         app:layout_constraintStart_toStartOf="@id/fb_login_button"
         app:layout_constraintEnd_toEndOf="@id/fb_login_button"/>

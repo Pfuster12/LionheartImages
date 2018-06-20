@@ -11,9 +11,23 @@
 
     <!-- Instagram button -->
     <string name="instagram_title">Instagram</string>
+    <!-- Facebook button -->
+    <string name="facebook_title">Facebook</string>
     <!-- Instagram Auth toolbar title -->
     <string name="instagram_toolbar_auth">Instagram Authorisation</string>
 
     <!-- Cancel button content description -->
     <string name="cancel_content_description">Cancel button</string>
+
+    <!-- Cancel button content description -->
+    <string name="welcome_start_editing">Get me to some images!</string>
+
+    <!-- Cancel button content description -->
+    <string name="return_start_editing">OK, I\'m done.</string>
+
+    <!-- Cancel button content description -->
+    <string name="login_prompt">Alright alright. But first, let me steal some of your profile data.</string>
+
+    <!-- Cancel button content description -->
+    <string name="return_to_gif">Wait! I want to see that awesome gif again.</string>
 </resources>

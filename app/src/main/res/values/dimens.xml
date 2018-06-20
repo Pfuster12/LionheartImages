@@ -6,6 +6,24 @@
     <!-- icon dimension -->
     <dimen name="ic_dimen">16dp</dimen>
 
+    <!-- buttons width -->
+    <dimen name="button_width">160dp</dimen>
+
     <!-- general margin dimensions -->
     <dimen name="general_margin_dimen">16dp</dimen>
+
+    <!-- general margin dimensions -->
+    <dimen name="login_prompt_dimen">48dp</dimen>
+
+    <!-- gif welcome screen top margin -->
+    <dimen name="gif_top_margin">60dp</dimen>
+
+    <!-- logo margin top -->
+    <dimen name="logo_top_margin">86dp</dimen>
+
+    <!-- logo margin top -->
+    <dimen name="return_text_bottom_margin">32dp</dimen>
+
+    <!-- gif height -->
+    <dimen name="gif_height">160dp</dimen>
 </resources>

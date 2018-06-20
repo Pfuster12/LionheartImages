@@ -7,6 +7,8 @@ import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.transition.Fade
+import android.transition.TransitionInflater
 import android.util.Log
 import com.facebook.AccessToken
 import com.lionheart.android.lionheartimages.R
@@ -33,11 +35,15 @@ class MainActivity : AppCompatActivity() {
     / functions
     */
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val fade = Fade()
+        fade.duration = 900
+        window.enterTransition = fade
         setContentView(R.layout.activity_main)
+
+        // allow better transitions
+        //window.allowEnterTransitionOverlap
 
         // run the start up check
         checkStartUpScreen()
@@ -60,7 +66,7 @@ class MainActivity : AppCompatActivity() {
             // TODO fill list with dummies if it is null
             if (images != null) {
                 for (image in images.iterator()) {
-                    Log.e("OBSERVER", image.imageLink)
+                    Log.e("YOO I'M HERE", image.imageLink)
                 }
             }
         })
