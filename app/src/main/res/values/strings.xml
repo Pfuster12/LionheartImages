@@ -27,6 +27,16 @@
     <string name="welcome_start_editing">Get me to some images!</string>
 
     <!-- Cancel button content description -->
+    <string name="next_Action">Next</string>
+
+    <!-- Cancel button content description -->
+    <string name="share_action">Share</string>
+
+
+    <!--fire button text-->
+    <string name="select_info">Select</string>
+
+    <!-- Cancel button content description -->
     <string name="return_start_editing">OK, I\'m done.</string>
 
     <!-- Cancel button content description -->

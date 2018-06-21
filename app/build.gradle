@@ -59,6 +59,12 @@ dependencies {
     // recycler view
     implementation 'com.android.support:recyclerview-v7:27.1.1'
 
+    // google vision services
+    implementation 'com.google.android.gms:play-services-vision:15.0.2'
+
+    // Glide dependency
+    implementation 'com.github.bumptech.glide:glide:4.4.0'
+
     // navigation architecture libs
     implementation "android.arch.navigation:navigation-fragment-ktx:1.0.0-alpha02" // use -ktx for Kotlin
     implementation "android.arch.navigation:navigation-ui-ktx:1.0.0-alpha02" // use -ktx for Kotlin

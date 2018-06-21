@@ -68,6 +68,8 @@ class WelcomeScreenActivity : AppCompatActivity() {
         val slide = Slide(Gravity.TOP)
         slide.duration = 900
         window.exitTransition = slide
+        val slideEnter = Slide(Gravity.BOTTOM)
+        window.enterTransition = slideEnter
         setContentView(R.layout.activity_welcome_screen)
 
         // start the gif
@@ -89,6 +91,20 @@ class WelcomeScreenActivity : AppCompatActivity() {
         return accessToken != null && !accessToken.isExpired
     }
 
+    private fun setFBButtonLogIn() {
+        // set the title and color back
+        facebook_login_button_welcome.text = getString(R.string.facebook_title)
+        facebook_login_button_welcome.background
+                .setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorFacebookBlue))
+    }
+
+    private fun setFBButtonLogOut() {
+        // set the title and color back
+        facebook_login_button_welcome.text = getString(R.string.fb_log_out)
+        facebook_login_button_welcome.background
+                .setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorTextGray))
+    }
+
     /**
      * Helper fun to set up facebook login button
      */
@@ -96,12 +112,8 @@ class WelcomeScreenActivity : AppCompatActivity() {
         // set the user_photos permission in the login button.
         // check if auth is already given
         if (!isFBLoggedIn()) {
-            // set the title and color back
-            with(facebook_login_button_welcome) {
-                text = getString(R.string.facebook_title)
-                background
-                        .setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorFacebookBlue))
-            }
+            loggedCheck.fbLogged = false
+            setFBButtonLogIn()
             // if not then log in with the click
             facebook_login_button_welcome.setOnClickListener {
                 LoginManager.getInstance().logInWithReadPermissions(this, arrayListOf(USER_PHOTOS))
@@ -110,23 +122,14 @@ class WelcomeScreenActivity : AppCompatActivity() {
             // set the logger check to true for fb
             loggedCheck.fbLogged = true
 
-
             // set the text and color to log out
-            with(facebook_login_button_welcome) {
-                background.setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorTextGray))
-                text = getString(R.string.fb_log_out)
-            }
+            setFBButtonLogOut()
 
             // set a new on click to log out using the manager
             facebook_login_button_welcome.setOnClickListener {
                 LoginManager.getInstance().logOut()
 
-                // set the title and color back
-                with(facebook_login_button_welcome) {
-                    text = getString(R.string.facebook_title)
-                    background
-                            .setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorFacebookBlue))
-                }
+                setFBButtonLogIn()
             }
         }
 
@@ -148,10 +151,7 @@ class WelcomeScreenActivity : AppCompatActivity() {
                         loggedCheck.fbLogged = true
 
                         // set the text and color to log out
-                        with(facebook_login_button_welcome) {
-                            background.setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorTextGray))
-                            text = getString(R.string.fb_log_out)
-                        }
+                        //setFBButtonLogOut()
 
                         // show the proceed text if not shown already
                         with(next_activity_text) {
@@ -166,13 +166,7 @@ class WelcomeScreenActivity : AppCompatActivity() {
                             LoginManager.getInstance().logOut()
 
                             // set the title and color back
-                            with(facebook_login_button_welcome) {
-                                text = getString(R.string.facebook_title)
-                                background
-                                        .setTint(ContextCompat
-                                                .getColor(this@WelcomeScreenActivity,
-                                                R.color.colorFacebookBlue))
-                            }
+                            //setFBButtonLogIn()
                         }
                     }
 
@@ -262,16 +256,18 @@ class WelcomeScreenActivity : AppCompatActivity() {
             val xTranslation = screenWidth.div(2) - instagram_login_button_welcome.layoutParams.width.div(2)
             instagram_login_button_welcome.animate()
                     .x(xTranslation.toFloat())
-                    .setDuration(250)
+                    .setDuration(300)
                     .setStartDelay(800)
                     .start()
-            // fb translation
+
+            /*// fb translation
             facebook_login_button_welcome.animate()
                     .x(xTranslation.toFloat())
                     .setDuration(250)
-                    .setStartDelay(1100)
-                    .start()
-            facebook_login_button_welcome.visibility = View.VISIBLE
+                    .setStartDelay(1000)
+                    .start()*/
+
+            facebook_login_button_welcome.x = xTranslation.toFloat()
 
             if (loggedCheck.fbLogged || loggedCheck.instaLogged) {
                 // show the proceed text if not shown already
@@ -292,13 +288,9 @@ class WelcomeScreenActivity : AppCompatActivity() {
             val screenWidth = metrics.widthPixels
 
             // insta translation
-            instagram_login_button_welcome.animate()
-                    .x(screenWidth.toFloat())
-                    .start()
+            instagram_login_button_welcome.x = screenWidth.toFloat()
             // fb translation
-            facebook_login_button_welcome.animate()
-                    .x(screenWidth.toFloat())
-                    .start()
+            facebook_login_button_welcome.x = screenWidth.toFloat()
 
             // set up the transition mgr to do anims
             TransitionManager.beginDelayedTransition(transitions_container)

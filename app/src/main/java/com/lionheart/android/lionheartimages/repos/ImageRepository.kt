@@ -1,7 +1,6 @@
 package com.lionheart.android.lionheartimages.repos
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -29,7 +28,8 @@ class ImageRepository private constructor(private vararg val queryParams: Pair<S
     /*
      / global variables & constants
      */
-    private val hostURL = "https://graph.facebook.com/v3.0/me"
+    private val hostFBUrl = "https://graph.facebook.com/v3.0/me"
+    private val hostInstaUrl = "https://api.instagram.com/v1"
 
      companion object {
          // init a queue and dao objects
@@ -48,8 +48,11 @@ class ImageRepository private constructor(private vararg val queryParams: Pair<S
          fun getInstance(context: Context, vararg queryParams: Pair<String, String>): ImageRepository {
              // check if queue exists already
              queue = queue ?: Volley.newRequestQueue(context)
+             // instance of db dao
              imageDao = imageDao ?: ImageDatabase.getInstance(context).imageDao()
+             // executor for db operations on worker thread
              executor = executor ?: Executors.newSingleThreadExecutor()
+             // return instance of repo if not created yet, synchronized with threads
              return INSTANCE ?: synchronized(this) {
                  INSTANCE ?: ImageRepository(*queryParams)
              }
@@ -73,12 +76,10 @@ class ImageRepository private constructor(private vararg val queryParams: Pair<S
      * Check whether database has images saved or needs to re-fetch from the internet.
      */
     private fun refreshImages() {
-        //val hasImages = imageDao?.hasImages() == true
-        fetchImagesFromAPI()
-        /*if (!hasImages) {
-            // refresh the data through a volley call
-            fetchImagesFromAPI()
+        /*if (imageDao?.hasImages()!!.isNotEmpty()) {
+
         }*/
+        fetchImagesFromAPI()
     }
 
     /**
@@ -86,13 +87,16 @@ class ImageRepository private constructor(private vararg val queryParams: Pair<S
      */
     private fun fetchImagesFromAPI() {
         // pass the varargs to the function with the spread operator '*'
-        addVolleyRequest(buildURLQuery(*queryParams))
+        addFBVolleyRequest(buildURLQuery(*queryParams))
+        // add another request to the queue
+        //addInstaVolleyRequest(buildURLQuery(*queryParams))
+        Log.e("URLBUILD", buildURLQuery(*queryParams))
     }
 
     /**
      * Add volley request to the queue and receive JSON response.
      */
-    private fun addVolleyRequest(url: String) {
+    private fun addFBVolleyRequest(url: String) {
         // create the json request
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener { response ->
@@ -109,6 +113,16 @@ class ImageRepository private constructor(private vararg val queryParams: Pair<S
         queue?.add(jsonObjectRequest)
     }
 
+    private fun addInstaVolleyRequest(url: String) {
+        val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
+                Response.Listener { response ->
+                    // handle insta response
+                },
+                Response.ErrorListener { error ->
+                // handle the error
+                })
+    }
+
     /**
      * Helper fun to parse json response from fb api call and
      * returning the list of image pojos to save into the database
@@ -123,17 +137,25 @@ class ImageRepository private constructor(private vararg val queryParams: Pair<S
         val imageJsonArray = photoObject.getJSONArray("data")
 
         // iterate through the array
-        for (i in 0..imageJsonArray.length()) {
+        for (i in 0 until imageJsonArray.length()) {
             // grab the current image
             val image: JSONObject = imageJsonArray[i] as JSONObject
 
-            val thumbnailIndex = imageJsonArray.length() - 1
-            val thumbnailJson = image.getJSONArray("images")[thumbnailIndex] as JSONObject
+            // grab the array of thumbnail objects
+            val thumbnails = image.getJSONArray("images")
+
+            // grab the second image for a phone sized image
+            val imageJson = thumbnails[1] as JSONObject
+            val imageLink = imageJson.getString("source")
+            // get the one before last which seems to be the smallest
+            // for some reason
+            val thumbnailIndex = thumbnails.length() - 1
+            val thumbnailJson = thumbnails[thumbnailIndex] as JSONObject
             val thumbnailLink = thumbnailJson.getString("source")
 
             // grab the data from the image and create the image pojo
             val imagePojo = image.let {
-                LionheartImage(it.getInt("id"), it.getString("link"),
+                LionheartImage(it.getInt("id"), imageLink,
                         it.getInt("height"), it.getInt("width"), thumbnailLink)
             }
 
@@ -153,6 +175,9 @@ class ImageRepository private constructor(private vararg val queryParams: Pair<S
         var future: Future<Unit>? = null
         // submit a task and assign to the future
         future = executor?.submit<Unit> {
+            // clean out the database of old images
+            imageDao?.deleteAll()
+            // save the new images
            imageDao?.saveAll(*images.toTypedArray())
         }
 
@@ -167,11 +192,11 @@ class ImageRepository private constructor(private vararg val queryParams: Pair<S
         val builder = Uri.Builder()
 
         // add the host path
-        builder.encodedPath(hostURL)
+        builder.encodedPath(hostFBUrl)
 
         // build the query by adding the parameters given
         for (queryParam in queryParams) {
-            builder.appendQueryParameter(queryParam.first, queryParam.second)
+            builder.appendQueryParameter(queryParam.first, Uri.decode(queryParam.second))
         }
 
         // build the url

@@ -86,7 +86,7 @@
         style="@style/buttonStyle"
         app:layout_constraintTop_toBottomOf="@id/instagram_login_button_welcome"
         app:layout_constraintStart_toEndOf="parent"
-        android:visibility="invisible" />
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/next_activity_text"

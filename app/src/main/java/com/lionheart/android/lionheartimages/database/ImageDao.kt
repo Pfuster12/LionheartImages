@@ -11,9 +11,15 @@ interface ImageDao {
     @Query("SELECT * FROM images")
     fun getAll(): LiveData<List<LionheartImage>>
 
+    /*@Query("SELECT * FROM images")
+    fun hasImages(): List<Long>*/
+
     @Insert(onConflict = REPLACE)
     fun saveAll(vararg images: LionheartImage)
 
     @Delete
     fun deleteImages(vararg images: LionheartImage)
+
+    @Query("DELETE FROM images")
+    fun deleteAll()
 }
