@@ -1,5 +1,6 @@
 package com.lionheart.android.lionheartimages.ui
 
+import android.animation.Animator
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
@@ -22,12 +23,13 @@ import com.lionheart.android.lionheartimages.R
 import com.lionheart.android.lionheartimages.model.ImagesViewModel
 import com.lionheart.android.lionheartimages.pojo.LionheartImage
 import kotlinx.android.synthetic.main.activity_main.*
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Environment
+import android.transition.Slide
+import android.support.v4.content.ContextCompat
 import android.util.DisplayMetrics
 import android.util.SparseArray
-import com.bumptech.glide.load.resource.bitmap.BitmapEncoder
+import android.view.Gravity
 import com.google.android.gms.vision.face.Face
 import com.google.android.gms.vision.face.Landmark
 import java.io.ByteArrayOutputStream
@@ -38,7 +40,6 @@ import java.net.URL
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
-
 
 /**
  * Activity handling display of the main list of images stored in the app for editing and sharing.
@@ -52,14 +53,18 @@ class MainActivity : AppCompatActivity() {
     // shared prefs for a startup activity check
     private lateinit var mSharedPreferences: SharedPreferences
     // shared prefs key for boolean
-    private val START_UP_IS_SHOWN = "com.lionheart.android.lionheartimages.START_UP_IS_SHOWN"
-    // lateinit
+    private val WELCOME_SCREEN_SHOWN = "com.lionheart.android.lionheartimages.WELCOME_SCREEN_SHOWN"
+    // late init a view model in oncreate
     private lateinit var viewModel: ImagesViewModel
-    // init a fb accessToken, with nope so its non-null
-    private var accessToken = "nope"
+    // init a fb accessTokenFB, with nope so its non-null
+    private var accessTokenFB = "nope"
+    private var accessTokenInsta = "nope"
+
+    // recycler view adapter and list data
     private lateinit var adapter: LionheartRecyclerViewAdapter
     private lateinit var images: MutableList<LionheartImage>
-    // executor service for database operations
+
+    // executor service for bitmap ops
     private var executor: ExecutorService? = Executors.newSingleThreadExecutor()
     var selectedBitmap: Bitmap? = null
 
@@ -72,42 +77,137 @@ class MainActivity : AppCompatActivity() {
         // set the transition anim
         val fade = Fade()
         fade.duration = 500
-        fade.startDelay = 500
         window.enterTransition = fade
+        val slide = Slide(Gravity.END)
+        window.exitTransition = slide
         setContentView(R.layout.activity_main)
 
-        // check if fb is logged in and grab the accesToken
+        // check if fb is logged in and grab the access Token
         if (isFBLoggedIn()) {
-            accessToken = AccessToken.getCurrentAccessToken().token
+            accessTokenFB = AccessToken.getCurrentAccessToken().token
         }
 
-        // load images and observe the livedata
+        // grab the instagram token too
+        if (intent != null && intent.hasExtra(WelcomeScreenActivity.INSTA_AUTH_EXTRA_KEY)) {
+            accessTokenInsta = intent.getStringExtra(WelcomeScreenActivity.INSTA_AUTH_EXTRA_KEY)
+        }
+
+        // load images and observe the live data
         observeViewModel()
 
         // set a recycler view
         setUpRecyclerView()
 
-        setNextAction()
+        // show progress bar
+        with(progress_bar) {
+            visibility = View.VISIBLE
+            background = ContextCompat.getDrawable(this@MainActivity,
+                    R.color.colorBackgroundWhite)
+        }
 
+        // set buttons
+        setActions()
         setFireButton()
         setEmojiButton()
     }
 
-    private fun setNextAction() {
+
+    /**
+     * Helper fun to init the view model and observe the live data object.
+     */
+    private fun observeViewModel() {
+        // create the view model
+        viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
+        // observe changes of the LiveData object
+        // load the images from the db or fetch from the apis
+        // map the fb query params
+        val fbQueryMap = mutableMapOf(Pair("fields", "photos.limit(6){height,id,images,link,name,width}"),
+                Pair("access_token", accessTokenFB))
+        // map the insta params
+        val instaQueryMap = mutableMapOf(Pair("access_token", accessTokenInsta))
+
+        // observe the livedata in the viewmodel
+        viewModel.init(this, fbQueryMap, instaQueryMap)
+                .getImages()?.observe(this, Observer { imagesData ->
+                    // when the livedata is updated from the database
+                    // the result is called through here
+                    // hide progress bar
+                    with(progress_bar) {
+                        visibility = View.INVISIBLE
+                        background = ContextCompat.getDrawable(this@MainActivity,
+                                android.R.color.transparent)
+                    }
+                    if (imagesData != null && imagesData.isNotEmpty()) {
+                        recycler_view.animate().alpha(0f).start()
+                        // clear the list
+                        images.clear()
+                        // add the observed image data to the list handled by the adapter
+                        images.addAll(imagesData)
+                        adapter.notifyDataSetChanged()
+                        // select the first image automatically
+                        Glide.with(this@MainActivity)
+                                .load(images[0].imageLink)
+                                .transition(DrawableTransitionOptions.withCrossFade())
+                                .into(selected_image)
+                        recycler_view.animate().alpha(1f).setStartDelay(400).start()
+                    } else {
+                        adapter.notifyDataSetChanged()
+                        // select the first image automatically
+                        Glide.with(this@MainActivity)
+                                .load(LionheartRecyclerViewAdapter.placeholderImages[0])
+                                .transition(DrawableTransitionOptions.withCrossFade())
+                                .into(selected_image)
+                    }
+                })
+    }
+
+    /**
+     * init recycler view, the image list and set the on click
+     */
+    private fun setUpRecyclerView() {
+        // init images list
+        images = mutableListOf()
+        // init the layout to a grid
+        recycler_view.layoutManager = GridLayoutManager(this, resources.getInteger(R.integer.column_span))
+        // set the adapter with an onclick for the items
+        adapter = LionheartRecyclerViewAdapter(this, images, listener = {image, placeholder ->
+            // send the clicked image through the edit activity
+            Glide.with(this@MainActivity)
+                    .load(if (images.isNotEmpty()) image.imageLink else placeholder)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(selected_image)
+        })
+        recycler_view.adapter = adapter
+    }
+
+    /**
+     * Set the toolbar icons actions, next and share and return
+     */
+    private fun setActions() {
+        log_in_return_action.setOnClickListener {
+            finishAfterTransition()
+        }
+
         main_toolbar_next_action.setOnClickListener {
             when (main_toolbar_next_action.text) {
+                // next action button
                 getString(R.string.next_Action) -> {
                     // set up the transition mgr to do anims
                     TransitionManager.beginDelayedTransition(main_transitions_container)
-                    recycler_view.visibility = View.GONE
+                    return_selection_action.visibility = View.VISIBLE
+                    // rotate the icon
+                    return_selection_action.animate().setDuration(600).rotation(360f)
                     fire_action_button.visibility = View.VISIBLE
                     fire_emoji_button.visibility = View.VISIBLE
-                    main_toolbar_title.visibility = View.GONE
-                    return_selection_action.visibility = View.VISIBLE
-                    main_toolbar_next_action.text = getString(R.string.share_action)
                     select_info.visibility = View.VISIBLE
+                    main_toolbar_title.visibility = View.GONE
+                    recycler_view.visibility = View.GONE
+                    log_in_return_action.visibility = View.GONE
+                    main_toolbar_next_action.text = getString(R.string.share_action)
                 }
+                // share
                 getString(R.string.share_action) -> {
+                    // share action to launch a chooser and send the image
                     val share = Intent(Intent.ACTION_SEND)
                     share.type = "image/jpeg"
                     val bytes = ByteArrayOutputStream()
@@ -128,18 +228,19 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            // return icon on toolbar action to go back to image selection
             return_selection_action.setOnClickListener {
                 // set up the transition mgr to do anims
                 TransitionManager.beginDelayedTransition(main_transitions_container)
                 recycler_view.visibility = View.VISIBLE
+                log_in_return_action.visibility = View.VISIBLE
+                main_toolbar_title.visibility = View.VISIBLE
                 fire_action_button.visibility = View.GONE
                 fire_emoji_button.visibility = View.GONE
                 fire_emoji_eyes.visibility = View.GONE
                 fire_emoji_eyes_2.visibility = View.GONE
                 main_toolbar_next_action.text = getString(R.string.next_Action)
                 select_info.visibility = View.GONE
-
-                main_toolbar_title.visibility = View.VISIBLE
                 return_selection_action.visibility = View.GONE
 
                 thug_glasses.visibility = View.INVISIBLE
@@ -165,7 +266,6 @@ class MainActivity : AppCompatActivity() {
             var leftCy = 0
             var rightCx = 0
             var rightCy = 0
-
 
             val detector = FaceDetector.Builder(this)
                     .setTrackingEnabled(false)
@@ -292,25 +392,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * init recycler view, the image list and set the on click
-     */
-    private fun setUpRecyclerView() {
-        // init images list
-        images = mutableListOf()
-        // init the layout to a grid
-        recycler_view.layoutManager = GridLayoutManager(this, resources.getInteger(R.integer.column_span))
-        //
-        adapter = LionheartRecyclerViewAdapter(this, images, listener = {image ->
-            // send the clicked image through the edit activity
-            Glide.with(this@MainActivity)
-                    .load(image.imageLink)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(selected_image)
-        })
-        recycler_view.adapter = adapter
-    }
-
-    /**
      * Helper fun to check fb token is current
      */
     private fun isFBLoggedIn(): Boolean {
@@ -319,51 +400,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Helper fun to init the view model and observe the live data object.
-     */
-    private fun observeViewModel() {
-        // create the view model
-        viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
-        // observe changes of the LiveData object
-        // load the images from the db or fetch from the apis
-        viewModel.init(this,
-                Pair("fields", "photos.limit(15){height,id,images,link,name,width}"),
-                Pair("access_token", accessToken))
-                .getImages()?.observe(this, Observer { imagesData ->
-                    // when the livedata is updated from the database
-                    // the result is called through here
-            // TODO fill list with dummies if it is null
-            if (imagesData != null && imagesData.isNotEmpty()) {
-                // clear the list
-                images.clear()
-                // add the observed image data to the list handled by the adapter
-                images.addAll(imagesData)
-                adapter.notifyDataSetChanged()
-
-                // select the first image automatically
-                if (selected_image.drawable != null) {
-                    Glide.with(this@MainActivity)
-                            .load(images[0].imageLink)
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .into(selected_image)
-                }
-            }
-        })
-    }
-
-    /**
      * Helper fun to check if start up screen has been shown.
      */
     private fun checkStartUpScreen() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         // grab the boolean with a false default
-        val isStartUpShown = mSharedPreferences.getBoolean(START_UP_IS_SHOWN, false)
+        val isStartUpShown = mSharedPreferences.getBoolean(WELCOME_SCREEN_SHOWN, false)
 
         when (isStartUpShown) {
             false -> {
-                mSharedPreferences.edit().putBoolean(START_UP_IS_SHOWN, true).apply()
+                mSharedPreferences.edit().putBoolean(WELCOME_SCREEN_SHOWN, true).apply()
                 // send the activity intent
-                val intent = Intent(this, StartUpActivity::class.java)
+                val intent = Intent(this, WelcomeScreenActivity::class.java)
                 startActivity(intent)
             }
         }
@@ -393,7 +441,7 @@ class MainActivity : AppCompatActivity() {
                 val filter = ColorMatrixColorFilter(matrix)
                 selected_image.colorFilter = filter
             }
-            View.GONE -> finish()
+            View.GONE -> finishAfterTransition()
         }
         super.onBackPressed()
     }

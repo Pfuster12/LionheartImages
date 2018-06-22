@@ -4,13 +4,10 @@
     <dimen name="toolbar_height">55dp</dimen>
 
     <!-- icon dimension -->
-    <dimen name="ic_dimen">12dp</dimen>
+    <dimen name="ic_dimen">14dp</dimen>
 
     <!-- buttons width -->
     <dimen name="button_width">160dp</dimen>
-
-    <!-- buttons width -->
-    <dimen name="image_container_height">300dp</dimen>
 
     <!-- general margin dimensions -->
     <dimen name="general_margin_dimen">16dp</dimen>
@@ -32,6 +29,9 @@
 
     <!-- gif height -->
     <dimen name="gif_height">160dp</dimen>
+
+    <!-- gif height -->
+    <dimen name="kon_height">100dp</dimen>
 
     <!--gridview height-->
     <dimen name="grid_item_height">80dp</dimen>

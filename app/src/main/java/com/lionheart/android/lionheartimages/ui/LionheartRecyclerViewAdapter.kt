@@ -18,7 +18,7 @@ import com.lionheart.android.lionheartimages.pojo.LionheartImage
  */
 class LionheartRecyclerViewAdapter(private val context: Context,
                                    private val images: List<LionheartImage>,
-                                   private val listener: (image: LionheartImage) -> Unit)
+                                   private val listener: (image: LionheartImage, placeholder: Int) -> Unit)
     : RecyclerView.Adapter<ViewHolder>() {
 
     /*
@@ -26,6 +26,13 @@ class LionheartRecyclerViewAdapter(private val context: Context,
      */
 
     private val IMAGE_ITEM_TYPE = 101
+    private val PLACEHOLDER_TYPE = 102
+    companion object {
+        val placeholderImages = listOf<Int>(R.drawable.boy,
+                R.drawable.girl,
+                R.drawable.girl_2,
+                R.drawable.ic_girl_1)
+    }
 
     /*
     / functions
@@ -55,14 +62,14 @@ class LionheartRecyclerViewAdapter(private val context: Context,
      */
     override fun getItemCount(): Int {
         // get item count
-        return images.size
+        return if (images.isNotEmpty()) images.size else placeholderImages.size
     }
 
     /**
      * Override function to get the items type in case it is a header or footer
      */
     override fun getItemViewType(position: Int): Int {
-        return IMAGE_ITEM_TYPE
+        return if (images.isNotEmpty()) IMAGE_ITEM_TYPE else PLACEHOLDER_TYPE
     }
 
     /**
@@ -73,10 +80,12 @@ class LionheartRecyclerViewAdapter(private val context: Context,
         // bind view holder
         when (getItemViewType(position)) {
             IMAGE_ITEM_TYPE -> {
-                // cast the holder to an image holder
-                val imageViewHolder = holder as ImageViewHolder
-                // bind the views
-                bindImageItem(imageViewHolder, position)
+                // bind the views and cast the holder to an image holder
+                bindImageItem(holder as ImageViewHolder, position)
+            }
+            PLACEHOLDER_TYPE -> {
+                // bind the views and cast the holder to an image holder
+                bindPlaceHolder(holder as ImageViewHolder, position)
             }
         }
     }
@@ -96,11 +105,25 @@ class LionheartRecyclerViewAdapter(private val context: Context,
     }
 
     /**
+     * Helper fun to bind palceholder views to the view holder
+     */
+    private fun bindPlaceHolder(holder: ImageViewHolder, position: Int) {
+        // get current image
+        val currentPlaceholder = placeholderImages[position]
+
+        // set the image
+        Glide.with(context)
+                .load(currentPlaceholder)
+                .transition(withCrossFade())
+                .into(holder.image)
+    }
+
+    /**
      * Viewholder class to hold the image
      */
     class ImageViewHolder(itemView: View,
                           private val images: List<LionheartImage>,
-                          private val listener: (image: LionheartImage) -> Unit)
+                          private val listener: (image: LionheartImage, placeholder: Int) -> Unit)
         : ViewHolder(itemView) {
 
         init {
@@ -108,7 +131,10 @@ class LionheartRecyclerViewAdapter(private val context: Context,
             // constructor, i.e. defined in the activity. make sure the adapter position
             // is within the extracts and not a header or footer.
             itemView.setOnClickListener{
-                listener(images[adapterPosition])
+                // if no images are loaded pass the placeholder and send a dummy image
+                listener(if (images.isNotEmpty()) images[adapterPosition] else LionheartImage(
+                        0, "", 0, 0, ""),
+                        if (images.isNotEmpty()) placeholderImages[0] else placeholderImages[adapterPosition])
             }
         }
 

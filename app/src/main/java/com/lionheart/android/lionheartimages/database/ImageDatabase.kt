@@ -6,6 +6,9 @@ import android.arch.persistence.room.RoomDatabase
 import android.content.Context
 import com.lionheart.android.lionheartimages.pojo.LionheartImage
 
+/**
+ * Room database class, creates db file and gives access to the database dao (data access object).
+ */
 @Database(entities = [LionheartImage::class], version = 1)
 abstract class ImageDatabase: RoomDatabase() {
     abstract fun imageDao(): ImageDao
@@ -20,6 +23,9 @@ abstract class ImageDatabase: RoomDatabase() {
     companion object {
         private var INSTANCE: ImageDatabase? = null
 
+        /**
+         * instance function initializing the database synchronized with threads.
+         */
         fun getInstance(context: Context) =
                 INSTANCE ?: synchronized(this) {
                     INSTANCE ?: Room.databaseBuilder(context.applicationContext,

@@ -11,15 +11,16 @@
 
     <!-- Toolbar title style -->
     <style name="LogoTitle" parent="Base.TextAppearance.AppCompat.Title">
-        <item name="android:fontFamily">@font/sueellenfranciso</item>
-        <item name="android:textSize">64sp</item>
+        <item name="android:fontFamily">@font/amatic_r</item>
+        <item name="android:textSize">62sp</item>
         <item name="android:textColor">@color/colorPrimaryDark</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <!-- Toolbar title style -->
     <style name="ToolbarTitle" parent="Base.TextAppearance.AppCompat.Medium">
         <item name="android:fontFamily">@font/coming_soon_font</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <!-- button style -->
@@ -37,7 +38,7 @@
     <!-- Toolbar title style -->
     <style name="BodyTextStyle" parent="Base.TextAppearance.AppCompat.Title">
         <item name="android:fontFamily">@font/coming_soon_font</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0.12</item>
         <item name="android:textColor">@color/colorTextGray</item>

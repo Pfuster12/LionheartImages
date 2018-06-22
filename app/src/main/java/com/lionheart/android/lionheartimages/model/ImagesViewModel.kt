@@ -27,8 +27,8 @@ class ImagesViewModel : ViewModel() {
      * init function to get instance of the repo. The function returns 'this' to chain methods
      * and get the livedata instance from the repo for the activity to observe it
      */
-    fun init(context: Context, vararg queryParams: Pair<String, String>): ImagesViewModel {
-        imageRepo = ImageRepository.getInstance(context, *queryParams)
+    fun init(context: Context, queryParamsFB: Map<String, String>, queryParamsInsta: Map<String, String>): ImagesViewModel {
+        imageRepo = ImageRepository.getInstance(context, queryParamsFB, queryParamsInsta)
         return this
     }
 

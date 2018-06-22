@@ -8,6 +8,9 @@
     <string name="facebook_app_id">247340112688200</string>
     <!-- Toolbar title -->
     <string name="fb_login_protocol_scheme">fb247340112688200</string>
+
+    <!-- Toolbar title -->
+    <string name="insta_no_auth">none_insta</string>
     <!--fb button log out-->
     <string name="fb_log_out">LOG OUT</string>
 
@@ -24,6 +27,9 @@
     <string name="cancel_content_description">Cancel button</string>
 
     <!-- Cancel button content description -->
+    <string name="return_content_description">Return button</string>
+
+    <!-- Cancel button content description -->
     <string name="welcome_start_editing">Get me to some images!</string>
 
     <!-- Cancel button content description -->
@@ -32,9 +38,14 @@
     <!-- Cancel button content description -->
     <string name="share_action">Share</string>
 
+    <!-- Cancel button content description -->
+    <string name="pick_text">Pick an image</string>
 
     <!--fire button text-->
     <string name="select_info">Select</string>
+
+    <!--fire button text-->
+    <string name="reloading_text">Hmm, no answer. Reloading&#8230;</string>
 
     <!-- Cancel button content description -->
     <string name="return_start_editing">OK, I\'m done.</string>

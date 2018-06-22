@@ -11,8 +11,8 @@ interface ImageDao {
     @Query("SELECT * FROM images")
     fun getAll(): LiveData<List<LionheartImage>>
 
-    /*@Query("SELECT * FROM images")
-    fun hasImages(): List<Long>*/
+    @Query("SELECT imageId FROM images")
+    fun getIds(): List<Int>
 
     @Insert(onConflict = REPLACE)
     fun saveAll(vararg images: LionheartImage)

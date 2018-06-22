@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.drawable.AnimationDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.support.transition.TransitionManager
 import android.support.v4.content.ContextCompat
 import android.transition.Slide
@@ -22,6 +23,7 @@ import com.facebook.login.LoginResult
 import com.lionheart.android.lionheartimages.BuildConfig
 import com.lionheart.android.lionheartimages.R
 import kotlinx.android.synthetic.main.activity_welcome_screen.*
+import kotlin.math.log
 
 /**
  * Welcome screen greeting the user and handling log in buttons presentation
@@ -39,6 +41,7 @@ class WelcomeScreenActivity : AppCompatActivity() {
         val INTENT_INSTA_URL_KEY = "com.lionheart.android.lionheartimages.INSTA_URL_KEY"
         val INSTA_AUTH_RESULT_CODE_OK = 101
         val INSTA_AUTH_RESULT_CODE_ERROR = 102
+        val INSTA_AUTH_EXTRA_KEY = "com.lionheart.android.lionheartimages.INSTA_AUTH_EXTRA_KEY"
     }
 
     // create the Facebook callbackManager to handle login responses
@@ -51,7 +54,8 @@ class WelcomeScreenActivity : AppCompatActivity() {
             BuildConfig.INSTA_CLIENT_ID +
             "&redirect_uri=" +
             REDIRECT_URI + "&response_type=token"
-    private lateinit var accessToken: AccessToken
+    private lateinit var accessTokenFB: AccessToken
+    private var accessTokenInsta: String? = "none_insta"
 
     private val loggedCheck = object {
         var instaLogged = false
@@ -66,10 +70,11 @@ class WelcomeScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // set the exit transition for the activity
         val slide = Slide(Gravity.TOP)
-        slide.duration = 900
+        slide.duration = 800
         window.exitTransition = slide
         val slideEnter = Slide(Gravity.BOTTOM)
         window.enterTransition = slideEnter
+        // set content after anim set up
         setContentView(R.layout.activity_welcome_screen)
 
         // start the gif
@@ -91,20 +96,6 @@ class WelcomeScreenActivity : AppCompatActivity() {
         return accessToken != null && !accessToken.isExpired
     }
 
-    private fun setFBButtonLogIn() {
-        // set the title and color back
-        facebook_login_button_welcome.text = getString(R.string.facebook_title)
-        facebook_login_button_welcome.background
-                .setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorFacebookBlue))
-    }
-
-    private fun setFBButtonLogOut() {
-        // set the title and color back
-        facebook_login_button_welcome.text = getString(R.string.fb_log_out)
-        facebook_login_button_welcome.background
-                .setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorTextGray))
-    }
-
     /**
      * Helper fun to set up facebook login button
      */
@@ -118,6 +109,13 @@ class WelcomeScreenActivity : AppCompatActivity() {
             facebook_login_button_welcome.setOnClickListener {
                 LoginManager.getInstance().logInWithReadPermissions(this, arrayListOf(USER_PHOTOS))
             }
+            // hide the proceed text if not shown already
+            if (!loggedCheck.instaLogged) {
+                with(next_activity_text) {
+                    visibility = View.INVISIBLE
+                    animate().alpha(0f).start()
+                }
+            }
         } else {
             // set the logger check to true for fb
             loggedCheck.fbLogged = true
@@ -128,7 +126,7 @@ class WelcomeScreenActivity : AppCompatActivity() {
             // set a new on click to log out using the manager
             facebook_login_button_welcome.setOnClickListener {
                 LoginManager.getInstance().logOut()
-
+                setFBButton()
                 setFBButtonLogIn()
             }
         }
@@ -142,7 +140,7 @@ class WelcomeScreenActivity : AppCompatActivity() {
                     override fun onSuccess(result: LoginResult?) {
                         // success login, capture the access token
                         // check if app is logged in to fb through the access token
-                        accessToken = result!!.accessToken
+                        accessTokenFB = result!!.accessToken
                         Toast.makeText(this@WelcomeScreenActivity,
                         "User logged in", Toast.LENGTH_SHORT)
                         .show()
@@ -151,7 +149,8 @@ class WelcomeScreenActivity : AppCompatActivity() {
                         loggedCheck.fbLogged = true
 
                         // set the text and color to log out
-                        //setFBButtonLogOut()
+                        setFBButtonLogOut()
+                        setFBButton()
 
                         // show the proceed text if not shown already
                         with(next_activity_text) {
@@ -159,14 +158,6 @@ class WelcomeScreenActivity : AppCompatActivity() {
                                 visibility = View.VISIBLE
                                 animate().alpha(1f).start()
                             }
-                        }
-
-                        // set a new on click on the button to log out using the mngr
-                        facebook_login_button_welcome.setOnClickListener {
-                            LoginManager.getInstance().logOut()
-
-                            // set the title and color back
-                            //setFBButtonLogIn()
                         }
                     }
 
@@ -179,10 +170,8 @@ class WelcomeScreenActivity : AppCompatActivity() {
                         if (!loggedCheck.instaLogged) {
                             // hide the proceed text
                             with(next_activity_text) {
-                                if (visibility == View.VISIBLE) {
-                                    visibility = View.INVISIBLE
-                                    animate().alpha(0f).start()
-                                }
+                                visibility = View.INVISIBLE
+                                animate().alpha(0f).start()
                             }
                         }
                     }
@@ -218,9 +207,16 @@ class WelcomeScreenActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Helper fun to set on click to start next activity and pick a photo
+     */
     private fun setProceedToMainButton() {
         next_activity_text.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
+            // pass the instagram access token to the next activity if its received
+            if (accessTokenInsta != "none_insta") {
+                intent.putExtra(INSTA_AUTH_EXTRA_KEY, accessTokenInsta)
+            }
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
         }
     }
@@ -230,6 +226,16 @@ class WelcomeScreenActivity : AppCompatActivity() {
      * transition manager.
      */
     private fun setAnimations() {
+        // grab the screen info
+        val metrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(metrics)
+        val screenWidth = metrics.widthPixels
+
+        // animate initial alphas for welcome screen
+        logo_text.animate().alpha(1f).setStartDelay(500).setDuration(500).start()
+        lion_kon.animate().alpha(1f).setStartDelay(600).setDuration(300).start()
+        continue_text.animate().alpha(1f).setStartDelay(700).setDuration(300).start()
+
         // set the continue onclick
         continue_text.setOnClickListener {
 
@@ -237,37 +243,33 @@ class WelcomeScreenActivity : AppCompatActivity() {
                 // change login text
                 login_prompt_text.text = getString(R.string.return_login_prompt)
             }
-            // grab the screen info
-            val metrics = DisplayMetrics()
-            windowManager.defaultDisplay.getMetrics(metrics)
-            val screenWidth = metrics.widthPixels
 
             // set up the transition mgr to do anims
             TransitionManager.beginDelayedTransition(transitions_container)
             // change visibilities
             gif_image.visibility = View.GONE
             continue_text.visibility = View.GONE
+            lion_kon.visibility = View.GONE
+            lion_kon_2.visibility = View.VISIBLE
             login_prompt_text.visibility = View.VISIBLE
-            instagram_login_button_welcome.visibility = View.VISIBLE
             facebook_login_button_welcome.visibility = View.VISIBLE
+            instagram_login_button_welcome.visibility = View.VISIBLE
             return_text.visibility = View.VISIBLE
 
             // insta translation
             val xTranslation = screenWidth.div(2) - instagram_login_button_welcome.layoutParams.width.div(2)
             instagram_login_button_welcome.animate()
                     .x(xTranslation.toFloat())
-                    .setDuration(300)
-                    .setStartDelay(800)
+                    .setDuration(400)
+                    .setStartDelay(900)
                     .start()
 
-            /*// fb translation
+            // fb translation right after
             facebook_login_button_welcome.animate()
                     .x(xTranslation.toFloat())
-                    .setDuration(250)
-                    .setStartDelay(1000)
-                    .start()*/
-
-            facebook_login_button_welcome.x = xTranslation.toFloat()
+                    .setDuration(500)
+                    .setStartDelay(900)
+                    .start()
 
             if (loggedCheck.fbLogged || loggedCheck.instaLogged) {
                 // show the proceed text if not shown already
@@ -282,11 +284,6 @@ class WelcomeScreenActivity : AppCompatActivity() {
 
         // set the return on click
         return_text.setOnClickListener {
-            // grab the screen info
-            val metrics = DisplayMetrics()
-            windowManager.defaultDisplay.getMetrics(metrics)
-            val screenWidth = metrics.widthPixels
-
             // insta translation
             instagram_login_button_welcome.x = screenWidth.toFloat()
             // fb translation
@@ -299,7 +296,9 @@ class WelcomeScreenActivity : AppCompatActivity() {
             login_prompt_text.visibility = View.GONE
             gif_image.visibility = View.VISIBLE
             continue_text.visibility = View.VISIBLE
+            lion_kon_2.visibility = View.GONE
             return_text.visibility = View.GONE
+            lion_kon.visibility = View.VISIBLE
             instagram_login_button_welcome.visibility = View.INVISIBLE
             facebook_login_button_welcome.visibility = View.INVISIBLE
 
@@ -310,6 +309,26 @@ class WelcomeScreenActivity : AppCompatActivity() {
                     animate().alpha(0f).start()
                 }
             }
+        }
+    }
+
+    // Helper fun to set fb button to prompt log in fb blue
+    private fun setFBButtonLogIn() {
+        // set the title and color back
+        with(facebook_login_button_welcome) {
+            text = getString(R.string.facebook_title)
+            background.setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorFacebookBlue))
+            alpha = 1.0f
+        }
+    }
+
+    // Helper fun to set fb button to show log out in grey
+    private fun setFBButtonLogOut() {
+        // set the title and color back
+        with(facebook_login_button_welcome) {
+            text = getString(R.string.fb_log_out)
+            background.setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorTextGray))
+            alpha = 0.8f
         }
     }
 
@@ -328,19 +347,19 @@ class WelcomeScreenActivity : AppCompatActivity() {
 
                 // show the proceed text if not shown already
                 with(next_activity_text) {
-                    if (visibility == View.INVISIBLE) {
-                        visibility = View.VISIBLE
-                        animate().alpha(1f).start()
-                    }
+                    visibility = View.VISIBLE
+                    animate().alpha(1f).start()
                 }
 
                 // grab the url fragment
                 val fragment = data?.getStringExtra(WebViewActivity.RESULT_AUTH_INTENT_KEY)
                 // cull the text parameter
                 val authCode = fragment?.drop(13)
+                // set gloal var to the authcode
+                accessTokenInsta = authCode
                 Log.e(LOG_TAG, authCode.toString())
                 Toast.makeText(this@WelcomeScreenActivity,
-                        "Insta yes", Toast.LENGTH_SHORT)
+                        "Instagram logged in", Toast.LENGTH_SHORT)
                         .show()
 
                 // change the button to greyed out
@@ -350,21 +369,27 @@ class WelcomeScreenActivity : AppCompatActivity() {
                 }
             }
             INSTA_AUTH_RESULT_CODE_ERROR -> {
+                // set the log to false
+                loggedCheck.instaLogged = false
+                // show toast
                 Toast.makeText(this@WelcomeScreenActivity,
-                        "Insta cancelled", Toast.LENGTH_SHORT)
+                        "Instagram Log-in Failed", Toast.LENGTH_SHORT)
                         .show()
                 // check if facebook is logged out
                 if (!loggedCheck.fbLogged) {
                     // hide the proceed text
                     with(next_activity_text) {
-                        if (visibility == View.VISIBLE) {
-                            visibility = View.INVISIBLE
-                            animate().alpha(0f).start()
-                        }
+                        visibility = View.INVISIBLE
+                        animate().alpha(0f).start()
                     }
                 }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onBackPressed() {
+        finishAfterTransition()
+        super.onBackPressed()
     }
 }

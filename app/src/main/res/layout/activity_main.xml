@@ -16,21 +16,32 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
+            android:contentDescription="@string/return_content_description"
             android:id="@+id/return_selection_action"
-            android:layout_width="@dimen/ic_dimen"
-            android:layout_height="@dimen/ic_dimen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:src="@drawable/ic_cancel"
+            android:src="@drawable/ic_keyboard_backspace"
             android:background="@android:color/transparent"
             android:tint="@color/colorTextGray"
             android:visibility="gone"/>
+
+        <ImageButton
+            android:contentDescription="@string/return_content_description"
+            android:id="@+id/log_in_return_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_keyboard_backspace"
+            android:background="@android:color/transparent"
+            android:tint="@color/colorTextGray"/>
 
         <TextView
             android:id="@+id/main_toolbar_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/toolbar_title"
-            style="@style/ToolbarTitle"/>
+            android:text="@string/pick_text"
+            style="@style/ToolbarTitle"
+            android:paddingStart="@dimen/general_margin_dimen"/>
 
         <TextView
             android:id="@+id/main_toolbar_next_action"
@@ -45,23 +56,41 @@
     <FrameLayout
         android:id="@+id/selection_container"
         android:layout_width="0dp"
-        android:layout_height="@dimen/image_container_height"
+        android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/main_toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/selection_guideline_bottom">
 
         <ImageView
             android:id="@+id/selected_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:src="@tools:sample/avatars"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            tools:src="@tools:sample/avatars"/>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:background="@drawable/rounded_corner_button"
+            android:backgroundTint="@color/colorBackgroundWhite"
+            android:elevation="4dp"/>
     </FrameLayout>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/selection_guideline_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.7"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="1dp"
         app:layout_constraintTop_toBottomOf="@id/selection_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

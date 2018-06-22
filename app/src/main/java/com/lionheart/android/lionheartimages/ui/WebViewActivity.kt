@@ -4,9 +4,13 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.Window
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import com.lionheart.android.lionheartimages.R
 import kotlinx.android.synthetic.main.activity_web_view.*
 
@@ -25,6 +29,8 @@ class WebViewActivity : AppCompatActivity() {
         val INSTA_REDIRECT_URI = "android.lionheart.com"
     }
 
+    var reloaded = false
+
     /*
     / functions
     */
@@ -41,11 +47,13 @@ class WebViewActivity : AppCompatActivity() {
      * Helper fun to set web view and client using url received from the launching intent.
      */
     private fun setWebView() {
+        reloaded = false
         // grab the url data that launched this activity
-        val webViewUrl = intent?.extras?.getString(StartUpActivity.INTENT_INSTA_URL_KEY)
+        val webViewUrl = intent?.extras?.getString(WelcomeScreenActivity.INTENT_INSTA_URL_KEY)
 
         Log.e("TAG", webViewUrl.toString())
         webview.settings.javaScriptEnabled = true
+        webview.settings.builtInZoomControls = true
         // set the client to capture the url at each step
         webview.webViewClient = object : WebViewClient() {
             /**
@@ -65,6 +73,27 @@ class WebViewActivity : AppCompatActivity() {
                         }
                         false -> false
                     }
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                progress_bar_webview.visibility = View.GONE
+                super.onPageFinished(view, url)
+            }
+
+            override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                // if not reloaded once try a reload
+                if (!reloaded) {
+                    webview.reload()
+                    reloaded = true
+                    Toast.makeText(this@WebViewActivity,
+                            getString(R.string.reloading_text), Toast.LENGTH_SHORT)
+                            .show()
+                } else {
+                    val resultIntent = Intent()
+                    setResult(WelcomeScreenActivity.INSTA_AUTH_RESULT_CODE_ERROR, resultIntent)
+                    finish()
+                }
+                super.onReceivedError(view, request, error)
+            }
         }
 
         // set the webview to load the url captured in the intent extra

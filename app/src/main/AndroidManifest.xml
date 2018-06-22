@@ -15,12 +15,10 @@
         android:theme="@style/AppTheme">
 
         <!-- Main Activity -->
-        <activity android:name=".ui.MainActivity">
+        <activity android:name=".ui.MainActivity"
+            android:launchMode="singleTop">
 
         </activity>
-
-        <!-- StartUp Activity -->
-        <activity android:name=".ui.StartUpActivity" />
 
         <!-- Facebook meta-data -->
         <meta-data
@@ -45,7 +43,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.WebViewActivity" />
-        <activity android:name=".ui.WelcomeScreenActivity">
+        <activity android:name=".ui.WelcomeScreenActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

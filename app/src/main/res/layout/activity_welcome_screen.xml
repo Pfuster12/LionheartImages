@@ -7,6 +7,14 @@
     android:layout_height="match_parent"
     tools:context=".ui.WelcomeScreenActivity">
 
+
+    <android.support.constraint.Guideline
+        android:id="@+id/gif_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1"/>
+
     <ImageView
         android:id="@+id/gif_image"
         android:layout_width="0dp"
@@ -14,35 +22,48 @@
         android:src="@drawable/start_gif"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="@dimen/gif_top_margin"/>
-
+        app:layout_constraintTop_toTopOf="@id/gif_guideline" />
 
     <TextView
         android:id="@+id/logo_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/LogoTitle"
-        android:layout_marginTop="@dimen/logo_top_margin"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/toolbar_height"
         android:layout_marginStart="@dimen/general_margin_dimen"
         android:layout_marginEnd="@dimen/general_margin_dimen"
         app:layout_constraintTop_toBottomOf="@id/gif_image"
+        app:layout_constraintBottom_toTopOf="@id/lion_kon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/toolbar_title"/>
+        android:text="@string/toolbar_title"
+        android:alpha="0"/>
+
+    <ImageView
+        android:id="@+id/lion_kon"
+        android:layout_width="@dimen/kon_height"
+        android:layout_height="@dimen/kon_height"
+        android:src="@drawable/kon_drawing_blue"
+        android:layout_marginTop="@dimen/general_margin_dimen"
+        app:layout_constraintTop_toBottomOf="@id/logo_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:alpha="0"/>
 
     <TextView
         android:id="@+id/continue_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/BodyTextStyle"
-        android:layout_marginTop="@dimen/general_margin_dimen"
+        android:layout_marginTop="@dimen/login_prompt_dimen"
         android:layout_marginStart="@dimen/general_margin_dimen"
         android:layout_marginEnd="@dimen/general_margin_dimen"
-        app:layout_constraintTop_toBottomOf="@id/logo_text"
+        app:layout_constraintTop_toBottomOf="@id/lion_kon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
+        android:alpha="0"
         android:text="@string/welcome_start_editing"/>
 
     <TextView
@@ -77,7 +98,7 @@
 
     <Button
         android:id="@+id/facebook_login_button_welcome"
-        android:layout_width="160dp"
+        android:layout_width="@dimen/button_width"
         android:layout_height="32dp"
         android:text="@string/facebook_title"
         android:background="@drawable/rounded_corner_button"
@@ -85,8 +106,7 @@
         android:drawableStart="@drawable/ic_facebook_box"
         style="@style/buttonStyle"
         app:layout_constraintTop_toBottomOf="@id/instagram_login_button_welcome"
-        app:layout_constraintStart_toEndOf="parent"
-        android:visibility="invisible"/>
+        app:layout_constraintStart_toEndOf="parent" />
 
     <TextView
         android:id="@+id/next_activity_text"
@@ -104,6 +124,17 @@
         android:text="@string/continue_main_activity"
         android:alpha="0"
         android:visibility="invisible"/>
+
+    <ImageView
+        android:id="@+id/lion_kon_2"
+        android:layout_width="@dimen/kon_height"
+        android:layout_height="@dimen/kon_height"
+        android:src="@drawable/kon_drawing_blue"
+        android:layout_marginTop="@dimen/general_margin_dimen"
+        app:layout_constraintTop_toBottomOf="@id/next_activity_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/return_text"
