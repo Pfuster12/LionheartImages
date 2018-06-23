@@ -21,6 +21,13 @@
     <!-- gif welcome screen top margin -->
     <dimen name="gif_top_margin">60dp</dimen>
 
+    <!-- gif welcome screen top margin -->
+    <dimen name="cig_size">32dp</dimen>
+
+
+    <!-- gif welcome screen top margin -->
+    <dimen name="thug_life_text">90dp</dimen>
+
     <!-- logo margin top -->
     <dimen name="logo_top_margin">86dp</dimen>
 

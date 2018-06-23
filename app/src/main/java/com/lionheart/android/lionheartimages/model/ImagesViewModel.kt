@@ -32,5 +32,11 @@ class ImagesViewModel : ViewModel() {
         return this
     }
 
+    // direct to api call refresh method
+    fun refreshImages() {
+        imageRepo.directAPICall()
+    }
+
+    // getter
     fun getImages() = imageRepo.getImages()
 }

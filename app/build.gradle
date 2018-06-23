@@ -7,11 +7,11 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 //return a MY API KEY from a properties file.
-static def getMyApiKey(String property) {
+/*static def getMyApiKey(String property) {
     Properties properties = new Properties()
     properties.load(new FileInputStream("C:\\Users\\pfust\\Documents\\LionheartImages\\api_user\\api_keys.properties"))
     return "\"" + properties.getProperty(property) + "\""
-}
+}*/
 
 android {
     compileSdkVersion 27
@@ -37,9 +37,9 @@ android {
         }
     }
 
-    buildTypes.each {
+    /*buildTypes.each {
         it.buildConfigField "String", "INSTA_CLIENT_ID", getMyApiKey("instaClientId")
-    }
+    }*/
 }
 
 dependencies {
@@ -59,22 +59,17 @@ dependencies {
     // recycler view
     implementation 'com.android.support:recyclerview-v7:27.1.1'
 
-    // google vision services
-    implementation 'com.google.android.gms:play-services-vision:15.0.2'
+    // google ml kit vision libs
+    implementation 'com.google.firebase:firebase-ml-vision:16.0.0'
 
     // Glide dependency
     implementation 'com.github.bumptech.glide:glide:4.4.0'
-
-    // navigation architecture libs
-    implementation "android.arch.navigation:navigation-fragment-ktx:1.0.0-alpha02" // use -ktx for Kotlin
-    implementation "android.arch.navigation:navigation-ui-ktx:1.0.0-alpha02" // use -ktx for Kotlin
 
     // volley libs
     implementation 'com.android.volley:volley:1.1.0'
 
     // facebook sdk
     implementation('com.facebook.android:facebook-login:4.33.0')
-
 
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:1.1.1"
@@ -86,3 +81,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+// ADD THIS AT THE BOTTOM
+apply plugin: 'com.google.gms.google-services'
+

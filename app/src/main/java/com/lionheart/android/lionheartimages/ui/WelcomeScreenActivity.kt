@@ -1,11 +1,15 @@
 package com.lionheart.android.lionheartimages.ui
 
 import android.app.ActivityOptions
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.drawable.AnimationDrawable
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
+import android.support.design.widget.Snackbar
 import android.support.transition.TransitionManager
 import android.support.v4.content.ContextCompat
 import android.transition.Slide
@@ -23,7 +27,6 @@ import com.facebook.login.LoginResult
 import com.lionheart.android.lionheartimages.BuildConfig
 import com.lionheart.android.lionheartimages.R
 import kotlinx.android.synthetic.main.activity_welcome_screen.*
-import kotlin.math.log
 
 /**
  * Welcome screen greeting the user and handling log in buttons presentation
@@ -43,7 +46,6 @@ class WelcomeScreenActivity : AppCompatActivity() {
         val INSTA_AUTH_RESULT_CODE_ERROR = 102
         val INSTA_AUTH_EXTRA_KEY = "com.lionheart.android.lionheartimages.INSTA_AUTH_EXTRA_KEY"
     }
-
     // create the Facebook callbackManager to handle login responses
     private lateinit var mCallbackManager: CallbackManager
     // fb permission tag
@@ -51,7 +53,7 @@ class WelcomeScreenActivity : AppCompatActivity() {
 
     private val REDIRECT_URI = "http://android.lionheart.com"
     private val INSTA_AUTH_URL = "https://api.instagram.com/oauth/authorize/?client_id="+
-            BuildConfig.INSTA_CLIENT_ID +
+            "545d40491e7e42f6ab16ccc15731e9e9" +
             "&redirect_uri=" +
             REDIRECT_URI + "&response_type=token"
     private lateinit var accessTokenFB: AccessToken
@@ -86,6 +88,10 @@ class WelcomeScreenActivity : AppCompatActivity() {
         setFBButton()
         setInstaButton()
         setProceedToMainButton()
+
+        if (!isNetworkConnected()) {
+            Snackbar.make(transitions_container, getString(R.string.no_connection), Snackbar.LENGTH_SHORT)
+        }
     }
 
     /**
@@ -199,11 +205,64 @@ class WelcomeScreenActivity : AppCompatActivity() {
      * Helper fun to set up instagram login button
      */
     private fun setInstaButton() {
+        checkInstaToken()
+        // set the button appearance
+        if (loggedCheck.instaLogged) {
+            // change the button to greyed out
+            with(instagram_login_button_welcome) {
+                text = getString(R.string.fb_log_out)
+                background.setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorTextGray))
+            }
+        } else {
+            //hide  the proceed text if not shown already
+            with(next_activity_text) {
+                visibility = View.INVISIBLE
+                animate().alpha(0f).start()
+            }
+            // set button look
+            with(instagram_login_button_welcome) {
+                text = getString(R.string.instagram_title)
+                background.setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorInsta))
+            }
+        }
+        // set the on click listener
         instagram_login_button_welcome.setOnClickListener {
-            // launch an intent for the web view with the url as data
-            val intent = Intent(this, WebViewActivity::class.java)
-            intent.putExtra(INTENT_INSTA_URL_KEY, INSTA_AUTH_URL)
-            startActivityForResult(intent, INSTA_AUTH_RESULT_CODE_OK)
+            if (loggedCheck.instaLogged) {
+                // set logged to false
+                loggedCheck.instaLogged = false
+
+                // set button look
+                with(instagram_login_button_welcome) {
+                    text = getString(R.string.instagram_title)
+                    background.setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorInsta))
+                }
+                // write out the token
+                getPreferences(Context.MODE_PRIVATE)
+                        .edit()
+                        .remove(WelcomeScreenActivity.INSTA_AUTH_EXTRA_KEY)
+                        .apply()
+            } else {
+                // launch an intent for the web view with the url as data
+                val intent = Intent(this, WebViewActivity::class.java)
+                intent.putExtra(INTENT_INSTA_URL_KEY, INSTA_AUTH_URL)
+                startActivityForResult(intent, INSTA_AUTH_RESULT_CODE_OK)
+            }
+        }
+    }
+
+    // check for insta auth
+    private fun checkInstaToken() {
+        // check the prefs
+        val prefs = getPreferences(Context.MODE_PRIVATE)
+        if (prefs.contains(WelcomeScreenActivity.INSTA_AUTH_EXTRA_KEY)) {
+            // grab the token
+            val token = prefs.getString(WelcomeScreenActivity.INSTA_AUTH_EXTRA_KEY, accessTokenInsta)
+            if (token.isNotEmpty()) {
+                loggedCheck.instaLogged = true
+                accessTokenInsta = token
+            }
+        } else {
+            loggedCheck.instaLogged = false
         }
     }
 
@@ -212,6 +271,15 @@ class WelcomeScreenActivity : AppCompatActivity() {
      */
     private fun setProceedToMainButton() {
         next_activity_text.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            // pass the instagram access token to the next activity if its received
+            if (accessTokenInsta != "none_insta") {
+                intent.putExtra(INSTA_AUTH_EXTRA_KEY, accessTokenInsta)
+            }
+            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
+        }
+
+        lion_kon_2.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             // pass the instagram access token to the next activity if its received
             if (accessTokenInsta != "none_insta") {
@@ -272,12 +340,10 @@ class WelcomeScreenActivity : AppCompatActivity() {
                     .start()
 
             if (loggedCheck.fbLogged || loggedCheck.instaLogged) {
-                // show the proceed text if not shown already
+                // show the proceed text if not shown
                 with(next_activity_text) {
-                    if (visibility == View.INVISIBLE) {
-                        visibility = View.VISIBLE
-                        animate().alpha(1f).start()
-                    }
+                    visibility = View.VISIBLE
+                    animate().alpha(1f).start()
                 }
             }
         }
@@ -345,6 +411,11 @@ class WelcomeScreenActivity : AppCompatActivity() {
                 // set the insta log check to true
                 loggedCheck.instaLogged = true
 
+                with(instagram_login_button_welcome) {
+                    text = getString(R.string.fb_log_out)
+                    background.setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorTextGray))
+                }
+
                 // show the proceed text if not shown already
                 with(next_activity_text) {
                     visibility = View.VISIBLE
@@ -357,16 +428,13 @@ class WelcomeScreenActivity : AppCompatActivity() {
                 val authCode = fragment?.drop(13)
                 // set gloal var to the authcode
                 accessTokenInsta = authCode
-                Log.e(LOG_TAG, authCode.toString())
+                Log.e("INSTA_TOKEN", accessTokenInsta)
+                // save the code to preferences if user leaves app
+                instaAuthPreferenceSave(accessTokenInsta)
                 Toast.makeText(this@WelcomeScreenActivity,
                         "Instagram logged in", Toast.LENGTH_SHORT)
                         .show()
 
-                // change the button to greyed out
-                with(instagram_login_button_welcome) {
-                    text = getString(R.string.insta_logged_in)
-                    background.setTint(ContextCompat.getColor(this@WelcomeScreenActivity, R.color.colorTextGray))
-                }
             }
             INSTA_AUTH_RESULT_CODE_ERROR -> {
                 // set the log to false
@@ -386,6 +454,25 @@ class WelcomeScreenActivity : AppCompatActivity() {
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    /**
+     * Helper fun for network check
+     */
+    private fun isNetworkConnected(): Boolean {
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+        return activeNetwork?.isConnectedOrConnecting == true
+    }
+
+    /**
+     * function to store the instagram authorisation token
+     */
+    private fun instaAuthPreferenceSave(token: String?) {
+        val preferences = getPreferences(Context.MODE_PRIVATE)
+        preferences.edit()
+                .putString(WelcomeScreenActivity.INSTA_AUTH_EXTRA_KEY, token)
+                .apply()
     }
 
     override fun onBackPressed() {

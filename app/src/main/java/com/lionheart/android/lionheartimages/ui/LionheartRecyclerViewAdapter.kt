@@ -28,10 +28,10 @@ class LionheartRecyclerViewAdapter(private val context: Context,
     private val IMAGE_ITEM_TYPE = 101
     private val PLACEHOLDER_TYPE = 102
     companion object {
-        val placeholderImages = listOf<Int>(R.drawable.boy,
-                R.drawable.girl,
-                R.drawable.girl_2,
-                R.drawable.ic_girl_1)
+        val placeholderImages = listOf<Int>(R.drawable.boy_red,
+                R.drawable.girl_blue,
+                R.drawable.boy_1,
+                R.drawable.boy_2)
     }
 
     /*

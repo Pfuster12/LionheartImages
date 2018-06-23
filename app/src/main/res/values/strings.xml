@@ -6,8 +6,10 @@
 
     <!-- Facebook app id -->
     <string name="facebook_app_id">247340112688200</string>
-    <!-- Toolbar title -->
+    <!--fb protocol-->
     <string name="fb_login_protocol_scheme">fb247340112688200</string>
+    <!--insta client id-->
+    <string name="insta_client_id">545d40491e7e42f6ab16ccc15731e9e9</string>
 
     <!-- Toolbar title -->
     <string name="insta_no_auth">none_insta</string>
@@ -26,11 +28,26 @@
     <!-- Cancel button content description -->
     <string name="cancel_content_description">Cancel button</string>
 
+    <!--Internet no connection-->
+    <string name="no_connection">No connection to internet.</string>
+
     <!-- Cancel button content description -->
     <string name="return_content_description">Return button</string>
 
     <!-- Cancel button content description -->
     <string name="welcome_start_editing">Get me to some images!</string>
+
+    <!-- Cancel button content description -->
+    <string name="fire_eyes_text">Be on fire</string>
+
+    <!-- Cancel button content description -->
+    <string name="smile_probability">Google says you are %1$s smiling!</string>
+
+    <!-- Cancel button content description -->
+    <string name="no_humans">There doesn\'t seem to be any people here.</string>
+
+    <!-- Cancel button content description -->
+    <string name="thug_life_text">The Thug Life</string>
 
     <!-- Cancel button content description -->
     <string name="next_Action">Next</string>
@@ -42,10 +59,13 @@
     <string name="pick_text">Pick an image</string>
 
     <!--fire button text-->
-    <string name="select_info">Select</string>
+    <string name="select_info">Select a filter</string>
 
     <!--fire button text-->
-    <string name="reloading_text">Hmm, no answer. Reloading&#8230;</string>
+    <string name="reloading_text">Reloading&#8230;</string>
+
+    <!--fire button text-->
+    <string name="swipe_prompt">Not seeing new images? Swipe to refresh</string>
 
     <!-- Cancel button content description -->
     <string name="return_start_editing">OK, I\'m done.</string>
@@ -60,5 +80,5 @@
     <string name="return_to_gif">Wait! I want to see that awesome gif again.</string>
 
     <!--Continue to main activity text-->
-    <string name="continue_main_activity">I\'ve given you all you need. Proceed.</string>
+    <string name="continue_main_activity">I\'ve got all I need. Continue?</string>
 </resources>

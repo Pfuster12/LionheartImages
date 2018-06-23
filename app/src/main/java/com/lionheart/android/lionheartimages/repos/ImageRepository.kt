@@ -81,6 +81,16 @@ class ImageRepository private constructor(private val queryParamsFB: Map<String,
     }
 
     /**
+     * direct to api call function for user initiated refresh
+     */
+    fun directAPICall(): LiveData<List<LionheartImage>>? {
+        // delete images and call the api directly
+        deleteImages()
+        // return the dao livedata
+        return imageDao?.getAll()
+    }
+
+    /**
      * Check whether database has images saved or needs to fetched from the internet.
      */
     private fun refreshImages() {
@@ -92,7 +102,6 @@ class ImageRepository private constructor(private val queryParamsFB: Map<String,
             future = executor?.submit<Boolean> {
                 // check if the db is empty before making api call
                 val list = imageDao?.getIds()
-                imageDao?.deleteAll()
                 return@submit list?.size == 0
             }
         } catch (e: RejectedExecutionException) {
@@ -109,6 +118,31 @@ class ImageRepository private constructor(private val queryParamsFB: Map<String,
         if (isEmpty!!) {
             fetchImagesFromAPI()
         }
+    }
+
+    /**
+     * Check whether database has images saved or needs to fetched from the internet.
+     */
+    private fun deleteImages() {
+        // init the future to grab the executor task
+        var future: Future<Unit>? = null
+        // submit a task and assign to the future
+        try {
+            future = executor?.submit<Unit> {
+                // delete all the images
+                imageDao?.deleteAll()
+                fetchImagesFromAPI()
+            }
+        } catch (e: RejectedExecutionException) {
+            Log.e("REPO_GETIDS", e.toString())
+        }
+        // run the future and delete images
+        try {
+            future?.get()
+        } catch (e: Exception) {
+            Log.e("REPO_GETIDS", e.toString())
+        }
+
     }
 
     /**
@@ -248,17 +282,21 @@ class ImageRepository private constructor(private val queryParamsFB: Map<String,
             // grab properties
             val id = currentImage.getString("id")
             val imagesJsonObject = currentImage.getJSONObject("images")
-            val thumbnailJsonObject = imagesJsonObject.getJSONObject("thumbnail")
-            val thumbnailUrl = thumbnailJsonObject.getString("url")
+            if (imagesJsonObject != null) {
+                val thumbnailJsonObject = imagesJsonObject.getJSONObject("thumbnail")
+                val thumbnailUrl = thumbnailJsonObject.getString("url")
 
-            val standardImagejsonObject = imagesJsonObject.getJSONObject("standard_resolution")
+                val standardImagejsonObject = imagesJsonObject.getJSONObject("standard_resolution")
 
-            // init a image pojo
-            val imagePojo = standardImagejsonObject.let { LionheartImage(
-                    1, it.getString("url"), it.getInt("height"),
-                    it.getInt("width"), thumbnailUrl) }
-            // add it to the list
-            images.add(imagePojo)
+                // init a image pojo
+                val imagePojo = standardImagejsonObject.let { LionheartImage(
+                        id.dropLast(22).toInt(), it.getString("url"), it.getInt("height"),
+                        it.getInt("width"), thumbnailUrl) }
+                // add it to the list
+                images.add(imagePojo)
+            } else {
+                images.add(LionheartImage(-1, "", 0, 0, ""))
+            }
         }
 
         // return the list
