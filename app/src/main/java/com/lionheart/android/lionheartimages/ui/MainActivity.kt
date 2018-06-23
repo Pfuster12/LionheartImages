@@ -8,7 +8,6 @@ import android.content.SharedPreferences
 import android.graphics.*
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.transition.TransitionManager
 import android.support.v7.widget.GridLayoutManager
 import android.transition.Fade
@@ -21,25 +20,22 @@ import com.lionheart.android.lionheartimages.R
 import com.lionheart.android.lionheartimages.model.ImagesViewModel
 import com.lionheart.android.lionheartimages.pojo.LionheartImage
 import kotlinx.android.synthetic.main.activity_main.*
-import android.net.Uri
-import android.os.Environment
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.transition.Slide
 import android.view.Gravity
 import android.widget.ImageView
-import com.bumptech.glide.load.resource.bitmap.BitmapDrawableDecoder
-import com.bumptech.glide.load.resource.bitmap.BitmapEncoder
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
-import java.io.ByteArrayOutputStream
+import com.lionheart.android.lionheartimages.repos.ImageRepository
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 /**
  * Activity handling display of the main list of images stored in the app for editing and sharing.
@@ -731,5 +727,17 @@ class MainActivity : AppCompatActivity() {
             View.GONE -> finishAfterTransition()
         }
         super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        ImageRepository.executor?.shutdown()
+        try {
+            if (!ImageRepository.executor!!.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                ImageRepository.executor!!.shutdownNow()
+            }
+        } catch (e: InterruptedException) {
+            ImageRepository.executor?.shutdownNow()
+        }
+        super.onDestroy()
     }
 }

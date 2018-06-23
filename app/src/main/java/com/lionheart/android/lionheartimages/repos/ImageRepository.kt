@@ -39,7 +39,7 @@ class ImageRepository private constructor(private val queryParamsFB: Map<String,
          private var INSTANCE: ImageRepository? = null
 
          // executor service for database operations
-         private var executor: ExecutorService? = null
+         var executor: ExecutorService? = null
 
          /**
           * instance singleton function handling queue and database objects creation
