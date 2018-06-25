@@ -3,7 +3,7 @@ package com.lionheart.android.lionheartimages.ui
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.graphics.drawable.AnimationDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
@@ -13,6 +13,7 @@ import android.support.design.widget.Snackbar
 import android.support.transition.TransitionManager
 import android.support.v4.content.ContextCompat
 import android.transition.Slide
+import android.util.Base64
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
@@ -24,9 +25,10 @@ import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import com.lionheart.android.lionheartimages.BuildConfig
 import com.lionheart.android.lionheartimages.R
 import kotlinx.android.synthetic.main.activity_welcome_screen.*
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 /**
  * Welcome screen greeting the user and handling log in buttons presentation

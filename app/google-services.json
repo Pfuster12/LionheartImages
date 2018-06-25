@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "755585693798",
+    "firebase_url": "https://lionheart-images.firebaseio.com",
+    "project_id": "lionheart-images",
+    "storage_bucket": "lionheart-images.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755585693798:android:299064d97c62f3c0",
+        "android_client_info": {
+          "package_name": "com.lionheart.android.lionheartimages"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "755585693798-962e48ev6993u3hi9jlqq1lt2lunknek.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lionheart.android.lionheartimages",
+            "certificate_hash": "06320382c20f8633ac0f58447d15edfb514682ca"
+          }
+        },
+        {
+          "client_id": "755585693798-330rj3lht4kq6u6rtk76hg6c2vcjc0gq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY-109LcbjJcSDHmL7LUi2uutZJihOw-w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "755585693798-330rj3lht4kq6u6rtk76hg6c2vcjc0gq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
