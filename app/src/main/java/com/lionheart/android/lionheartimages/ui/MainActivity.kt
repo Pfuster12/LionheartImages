@@ -728,16 +728,4 @@ class MainActivity : AppCompatActivity() {
         }
         super.onBackPressed()
     }
-
-    override fun onDestroy() {
-        ImageRepository.executor?.shutdown()
-        try {
-            if (!ImageRepository.executor!!.awaitTermination(800, TimeUnit.MILLISECONDS)) {
-                ImageRepository.executor!!.shutdownNow()
-            }
-        } catch (e: InterruptedException) {
-            ImageRepository.executor?.shutdownNow()
-        }
-        super.onDestroy()
-    }
 }
